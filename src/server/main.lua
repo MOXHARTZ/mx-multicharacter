@@ -34,7 +34,6 @@ AddEventHandler('mx-multicharacter:GetCharacters', function ()
      local src = source
      if not src then DropPlayer(src, '[MX-MULTICHARACTER] Your information was not found') end
      local player = MX:GetIdentifier(src) if not player then DropPlayer(src, '[MX-MULTICHARACTER] Your information was not found') end
-     print('qwdasdwqdq', player)
      local fetch = [[SELECT * FROM users WHERE identifier = @id;]]
      local fetchData = {
           ['@id'] = player
