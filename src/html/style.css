@@ -1,0 +1,354 @@
+html {
+   margin: 0;
+   padding: 0;
+   background-repeat: no-repeat;
+}
+
+@font-face {
+  font-family: Play;
+  src: url(./fonts/Play.ttf);
+}
+
+@font-face {
+  font-family: fira;
+  src: url(./fonts/fira.ttf);
+}
+
+::-webkit-scrollbar {
+  display: none;
+  visibility: hidden;
+  opacity: 0
+}
+
+#core {
+  display: none;
+}
+
+#characters-container {
+  position: absolute;
+  margin-left: 25px;
+  width: 95%;
+  height: 12%;
+}
+
+.characters {
+  position: relative;
+  width: 13%;
+  height: 90%;
+  background: linear-gradient(250deg, rgb(17, 17, 17), rgb(51, 0, 0));
+  float: left;
+  margin-left: 170px;
+  border-radius: 5px;
+  box-shadow: 4px 4px 4px #000000;
+  cursor: pointer;
+}
+
+.fa-plus, .fa-times {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff
+}
+
+.characters:hover {
+  transform: scale(1.09);
+  transition: all .6s ease-in-out;
+}
+
+#information-container {
+  display: none;
+  position: absolute;
+  width: 42%;
+  height: 22%;
+  background: linear-gradient(250deg, rgb(17, 17, 17), rgb(51, 0, 0));
+  border-radius: 5px;
+  top: 82%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.fa-info-circle {
+  position: absolute;
+  margin-left: 10px;
+  top: 10px;
+  color: #fff;
+}
+
+#register-container {
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: -100%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  padding: 20;
+  background: linear-gradient(250deg, rgb(17, 17, 17), rgb(51, 0, 0));
+  border-radius: 10px;
+}
+
+#register-container h1 {
+  text-align: center;
+  padding: 0 0 20px 0;
+  border-bottom: 1px solid silver;
+  color: #fff
+}
+
+.center form {
+  padding: 0 40px;
+  box-sizing: border-box;
+}
+
+form .txt_field {
+  position: relative;
+  margin: 30px 0;
+}
+
+form .button {
+  height: 45px;
+  margin: 45px 0;
+}
+
+form .button input {
+  height: 100%;
+  width: 100%;
+  outline: none;
+  color: #fff;
+  border: none;
+  font-size: 18px;
+  font-weight: 500;
+  border-radius: 5px;
+  letter-spacing: 1px;
+  background: linear-gradient(-250deg, rgb(10, 17, 17), rgb(100, 0, 0));
+}
+
+form .button input:hover {
+  background: linear-gradient(250deg, rgb(10, 17, 17), rgb(100, 0, 0));
+}
+
+.txt_field input {
+  width: 100%;
+  padding: 0 5px;
+  height: 40px;
+  font-size: 16px;
+  border: none;
+  background-color: none;
+  outline: none;
+}
+
+.txt_field label {
+  position: absolute;
+  top: 50%;
+  left: 5px;
+  color: #adadad;
+  transform: translateY(-50%);
+}
+
+.container {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 22px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  color: #ffff;
+}
+
+.container input {
+position: absolute;
+opacity: 0;
+cursor: pointer;
+}
+
+input {
+  outline: none;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  padding-left: 15px;
+  font-size: 16px;
+}
+
+.checkmark {
+position: absolute;
+top: 0;
+left: 0;
+height: 25px;
+width: 25px;
+background-color: #eee;
+border-radius: 50%;
+}
+
+input ~ .checkmark {
+background-color: #ccc;
+}
+
+.container input:checked ~ .checkmark {
+background-color: #2196F3;
+}
+
+.checkmark:after {
+content: "";
+position: absolute;
+display: none;
+}
+
+.container input:checked ~ .checkmark:after {
+display: block;
+}
+
+.container .checkmark:after {
+     top: 9px;
+    left: 9px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+}
+
+.inform {
+  position: relative;
+  text-align: center;
+  font-size: 19;
+  margin-top: 7px;
+  color: #fff;
+}
+
+.line {
+  position: relative;
+  width: 300px;
+  margin-top: 5px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-bottom:solid 2px rgb(15, 15, 15);
+}
+
+#character-name {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: Play;
+  font-size: 16.5px;
+  color: #fff;
+}
+
+#properties-container {
+  display: none;
+  position: absolute;
+  width: 12%;
+  height: 11%;
+  left: 26%;
+  top: 3%;
+  border-radius: 5px;
+  transform: translate(-50%, -50%);
+}
+
+.fa-play {
+  position: absolute;
+  top: 50%;
+  left: 40%;
+  transform: translate(-50%, -30%);
+  color:#0ea3c1
+}
+
+.fa-user-minus {
+  position: absolute;
+  top: 100%;
+  left: 40%;
+  transform: translate(-50%, -30%);
+  color:rgb(163, 7, 7)
+}
+
+#info-container {
+  position: absolute;
+  display: none;
+  font-family: fira;
+  width: 250px;
+  height: 75px;
+  right: -100%;
+  top: 15%;
+  border-radius: 8px;
+  background:linear-gradient(250deg, rgb(17, 17, 17), rgb(51, 0, 0));
+  z-index: 99999;
+  text-align: center;
+}
+
+.inform-msg {
+  position: relative;
+  top: 37%;
+  color: rgb(206, 208, 216);
+}
+
+#areyousure-container {
+  position: absolute;
+  display: none;
+  font-family: fira;
+  width: 500px;
+  height: 200px;
+  left: 35%;
+  top: -100%;
+  border-radius: 8px;
+  background: linear-gradient(250deg, rgb(17, 17, 17), rgb(51, 0, 0));
+  z-index: 99999;
+}
+
+.areyousure-msg {
+  position: relative;
+  display: flex;
+  justify-content:center;
+  align-items: center;
+  top: 12%;
+  font-size: 18px;
+  font-family: fira;
+  color: rgb(235, 234, 234);
+}
+
+.areyousure-yes-container {
+  position: relative;
+  width: 100px;
+  height: 30px;
+  top: 20%;
+  left: 25%;
+  color: rgb(232, 233, 235);
+  border-radius: 8px;
+  text-align: center;
+  border: 2px solid rgb(235, 234, 234);
+}
+
+.areyousure-no-container {
+  position: relative;
+  width: 100px;
+  height: 30px;
+  top: 3.4%;
+  left: 50%;
+  color: rgb(235, 234, 234);
+  text-align: center;
+  border-radius: 8px;
+  border: 2px solid rgb(235, 234, 234);
+}
+
+.areyousure-yes-container:hover {
+  transition: all 0.7s;
+  background-color:#169256;
+  border: 2px solid rgb(207, 207, 207);
+  color: rgb(218, 218, 218);
+  transform: scale(1.15);
+}
+
+.areyousure-no-container:hover { 
+  transition: all 0.7s;
+  background-color:#c62828;
+  color: rgb(218, 218, 218);
+  border: 2px solid rgb(207, 207, 207);
+  transform: scale(1.15);
+}
+
+.areyousure-yes, .areyousure-no {
+  position: relative;
+  top: 5px;
+}
