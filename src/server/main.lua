@@ -130,16 +130,14 @@ function MX:CreateCitizenId()
 end
 
 function MX:DeleteCharacter(source, cid)
-     local fetch = [[SELECT citizenid FROM users WHERE citizenid = @cid;]]
-     local fetchData = {['@cid'] = cid}
-     local result = MySQL.Sync.fetchAll(fetch, fetchData)
-     if result and result[1] then
-          local exec = [[DELETE FROM users WHERE citizenid = @cid;]]
-          MySQL.Sync.execute(exec, fetchData)
+     if cid and source then
+          for _, v in pairs(self.DeleteTables) do
+               MySQL.Sync.execute("DELETE FROM `"..v.table.."` WHERE `"..v.owner.."` = '"..cid.."'")
+          end
           Wait(200)
-          DropPlayer(source, 'Your character has been deleted, please login again.')
+          DropPlayer(source, 'Your character has been deleted, please login again.') 
      else
-          self:TCE('mx-multicharacter:notification', source, 'Character not found')
+          DropPlayer(source, '.d?.') 
      end
 end
 
