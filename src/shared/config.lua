@@ -10,6 +10,20 @@ MX = {
      NewCharacterData = false,
 
      -- Config
+     DeleteTables = {
+          {
+               table = 'addon_account_data',
+               owner = 'owner'
+          },
+          {
+               table = 'datastore_data',
+               owner = 'owner'
+          },
+          {
+               table = 'users',
+               owner = 'citizenid'
+          }
+     },
      Identifier = 'license', 
      Anims = {
           {
