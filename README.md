@@ -1,7 +1,5 @@
 # Multicharacter
 
-Yo, i'm moxha. I wanted to share the multicharacter system that I have been developing for a while enjoy
-
 # Image:
 <img border="0" src="https://i.ibb.co/ns32sPR/Screenshot-1.png" />
 
