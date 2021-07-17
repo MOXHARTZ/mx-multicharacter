@@ -23,6 +23,7 @@ https://youtu.be/V87r0_HAujE
 # If you are using extendedmode or es_extended v.1.2
 
 - change `mx-multicharacter` > `src` > `shared` > `config.lua` > `Identifier = 'steam'`
+- and change only v1.2 `mx-multicharacter` > `src` > `shared` > `config.lua` > `essentialmode = true`
 
 | SCRIPT | CHANGE |
 | ------ | ------ |
