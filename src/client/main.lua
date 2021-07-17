@@ -196,7 +196,15 @@ RegisterNUICallback('CreateCharacter', function (data)
      }
      MX:DelEntity()
      DisplayRadar(1)
-     TriggerServerEvent('esx:onPlayerJoined', MX.CitizenId, MX.NewCharacterData)
+
+     if not MX.essentialmode then
+          TriggerServerEvent('esx:onPlayerJoined', MX.CitizenId, MX.NewCharacterData)
+     else
+          TriggerServerEvent('es:firstJoinProper')
+		TriggerEvent('es:allowedToSpawn')
+          TriggerEvent('esx:CharCreate', MX.CitizenId, MX.NewCharacterData)
+     end
+     
 end)
 
 RegisterNUICallback('PlayCharacter', function (data)

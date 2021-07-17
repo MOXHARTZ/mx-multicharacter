@@ -41,18 +41,41 @@ AddEventHandler('mx-multicharacter:GetCharacters', function ()
      local result = MySQL.Sync.fetchAll(fetch, fetchData)
      if result and #result > 0 then
           local data = {}
-          for i = 1, #result do
-               table.insert(data, {
-                    citizenid = result[i].citizenid or '',
-                    queue = result[i].queue or '',
-                    firstname = result[i].firstname or '',
-                    lastname = result[i].lastname or '',
-                    dateofbirth = result[i].dateofbirth or '',
-                    sex = result[i].sex or '',
-                    cash = json.decode(result[i].accounts).money or 0,
-                    bank = json.decode(result[i].accounts).bank or 0,
-                    skin = json.decode(result[i].skin) or false
-               })
+          if not MX.essentialmode then
+               for i = 1, #result do
+                    table.insert(data, {
+                         citizenid = result[i].citizenid or '',
+                         queue = result[i].queue or '',
+                         firstname = result[i].firstname or '',
+                         lastname = result[i].lastname or '',
+                         dateofbirth = result[i].dateofbirth or '',
+                         sex = result[i].sex or '',
+                         cash = json.decode(result[i].accounts).money or 0,
+                         bank = json.decode(result[i].accounts).bank or 0,
+                         skin = json.decode(result[i].skin) or false
+                    })
+               end
+          else
+               for i = 1, #result do
+                    local resultM = MySQL.Sync.fetchAll('SELECT name, money FROM user_accounts WHERE identifier = @id', {
+                         ['@id'] = result[i].citizenid
+                    })
+                    table.insert(data, {
+                         citizenid = result[i].citizenid or '',
+                         queue = result[i].queue or '',
+                         firstname = result[i].firstname or '',
+                         lastname = result[i].lastname or '',
+                         dateofbirth = result[i].dateofbirth or '',
+                         sex = result[i].sex or '',
+                         skin = json.decode(result[i].skin) or false
+                    })
+                    if resultM and resultM[1] then
+                         for j = 1, #resultM do
+                              data[i].cash = resultM[j].name == 'money' and resultM[j].money or 0
+                              data[i].bank = resultM[j].name == 'bank' and resultM[j].money or 0
+                         end
+                    end
+               end
           end
           Wait(0)
           local slots = {}

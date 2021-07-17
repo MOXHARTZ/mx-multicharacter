@@ -59,6 +59,7 @@ MX = {
                name = 'base'
           },
      },
+     essentialmode = false, 
      GeneralSpawn = vec3(-1049.942, -2724.759, 20.169294),
      InvisibleSpawn = vec3(1170.10, -1264.40, 70.75),
      UseVIP = true, -- true or false
