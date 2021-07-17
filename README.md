@@ -20,10 +20,11 @@ https://youtu.be/V87r0_HAujE
 
 - Open your `server.cfg` and add `ensure mx-multicharacter` `ensure mx-spawn`
 
-# If you are using extendedmode or es_extended v.1.2
+# If you are using extendedmode
 
 - change `mx-multicharacter` > `src` > `shared` > `config.lua` > `Identifier = 'steam'`
-- and change only v1.2 `mx-multicharacter` > `src` > `shared` > `config.lua` > `essentialmode = true`
+# If you are using es_extended v.1.2
+- change `mx-multicharacter` > `src` > `shared` > `config.lua` > `essentialmode = true`
 
 | SCRIPT | CHANGE |
 | ------ | ------ |
