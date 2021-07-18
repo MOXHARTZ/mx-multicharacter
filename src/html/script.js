@@ -102,7 +102,7 @@ $(function()
           AreYouSure("Do you approve the deletion of your character?", function(reply){
                if (reply == 'yes') {
                     $.post('https://mx-multicharacter/DeleteCharacter', JSON.stringify({
-                         citizenid: MX.CurrentCharacter.citizenid
+                         citizenid: MX.CurrentCharacter
                     }));
                }
           })
