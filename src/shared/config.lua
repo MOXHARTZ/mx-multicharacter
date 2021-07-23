@@ -59,6 +59,7 @@ MX = {
                name = 'base'
           },
      },
+     spawnselector = false,   -- If the character respawns after death, set it to "true"
      essentialmode = false, 
      GeneralSpawn = vec3(-1049.942, -2724.759, 20.169294),
      InvisibleSpawn = vec3(1170.10, -1264.40, 70.75),
