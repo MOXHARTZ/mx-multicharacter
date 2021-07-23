@@ -8,7 +8,7 @@ CreateThread(function ()
           Wait(0)
           if NetworkIsSessionActive() then
                MX:CharacterSelector()
-               if MX.spawnselector then
+               if MX.spawnmanager then
                     exports['spawnmanager']:setAutoSpawn(false)
                end
                break
