@@ -2,6 +2,7 @@ RegisterNetEvent('mx-multicharacter:CreateCharacter')
 RegisterNetEvent('mx-multicharacter:GetCharacters')
 RegisterNetEvent('mx-multicharacter:DeleteCharacter')
 RegisterNetEvent('mx-multicharacter:GetLastLoc')
+RegisterNetEvent('mx-multicharacter:CheckCharacterIsOwner')
 
 ESX = nil
 TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
@@ -124,7 +125,7 @@ function MX:GetCitizenId(source)
      return false
 end
 
-AddEventHandler('mx-multicharacter:CreateCharacter', function (tt) 
+AddEventHandler('mx-multicharacter:CreateCharacter', function (source, tt) 
      local src = source
      if not tt then
           local cid = MX:CreateCitizenId()
@@ -135,6 +136,34 @@ AddEventHandler('mx-multicharacter:CreateCharacter', function (tt)
           MX:TCE('mx-multicharacter:SetCitizenId', src, tt)
      end
 end)
+
+AddEventHandler('mx-multicharacter:CheckCharacterIsOwner', function (data)
+     local src = source
+     if MX:CheckCharacterIsOwner(src, data) then
+          TriggerEvent('mx-multicharacter:CreateCharacter', src, data)
+          MX:TCE('mx-spawn:Open', src, data)
+     else
+          DropPlayer(src, 'You dont have this character.')
+     end
+end)
+
+function MX:CheckCharacterIsOwner(source, cid)
+     local fetch = [[SELECT citizenid FROM users WHERE identifier = @identifier;]]
+     local fetchData = {
+          ['@identifier'] = self:GetIdentifier(source)
+     }
+     local result = MySQL.Sync.fetchAll(fetch, fetchData)
+     if result and #result >= 1 then
+          for i = 1, #result do
+               if cid == result[i].citizenid then
+                    return true
+               end
+          end
+     else
+          return false
+     end
+     return false
+end
 
 function MX:CreateCitizenId()
      local uniq = false
@@ -154,13 +183,17 @@ end
 
 function MX:DeleteCharacter(source, cid)
      if cid and source then
-          for _, v in pairs(self.DeleteTables) do
-               MySQL.Sync.execute("DELETE FROM `"..v.table.."` WHERE `"..v.owner.."` = '"..cid.."'")
+          if self:CheckCharacterIsOwner(source, cid) then
+               for _, v in pairs(self.DeleteTables) do
+                    MySQL.Sync.execute("DELETE FROM `"..v.table.."` WHERE `"..v.owner.."` = '"..cid.."'")
+               end
+               Wait(200)
+               DropPlayer(source, 'Your character has been deleted, please login again.') 
+          else
+               DropPlayer(src, 'You dont have this character.')
           end
-          Wait(200)
-          DropPlayer(source, 'Your character has been deleted, please login again.') 
      else
-          DropPlayer(source, '.d?.') 
+          DropPlayer(source, '...') 
      end
 end
 

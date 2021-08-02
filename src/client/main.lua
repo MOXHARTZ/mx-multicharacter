@@ -6,7 +6,7 @@ RegisterNetEvent('mx-multicharacter:SetCitizenId')
 CreateThread(function ()
      while true do
           Wait(0)
-          if NetworkIsSessionActive() then
+          if NetworkIsSessionActive() or NetworkIsPlayerActive(PlayerId()) then
                MX:CharacterSelector()
                if MX.spawnmanager then
                     exports['spawnmanager']:setAutoSpawn(false)
@@ -213,10 +213,10 @@ end)
 RegisterNUICallback('PlayCharacter', function (data)
      MX:Cam(false)
      SetNuiFocus(false, false)
-     TriggerServerEvent('mx-multicharacter:CreateCharacter', data.data)
-     TriggerEvent('mx-spawn:Open', data.data)
+     
      MX:DelEntity()
      DisplayRadar(1)
+     TriggerServerEvent('mx-multicharacter:CheckCharacterIsOwner', data.data)
 end)
 
 RegisterNUICallback('SelectCharacter', function (data)
