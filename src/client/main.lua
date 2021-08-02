@@ -184,7 +184,7 @@ RegisterNUICallback('CreateCharacter', function (data)
      FreezeEntityPosition(PlayerPedId(), false)
      MX:Cam(false)
      SetNuiFocus(false, false)
-     TriggerServerEvent('mx-multicharacter:CreateCharacter')
+     TriggerServerEvent('mx-multicharacter:CreateCharacter', GetPlayerServerId(PlayerId()))
      while not MX.CitizenId do
           print('Waiting...')
           Wait(100)
