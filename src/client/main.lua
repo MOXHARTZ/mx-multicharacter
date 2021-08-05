@@ -236,6 +236,10 @@ RegisterNUICallback('SelectCharacter', function (data)
      end
 end)
 
+exports('GetUseEssential', function ()
+     return MX.essentialmode
+end)
+
 exports('GetCid', function ()
      return MX.CitizenId
 end)
