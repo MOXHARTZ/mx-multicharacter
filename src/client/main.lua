@@ -210,10 +210,14 @@ RegisterNUICallback('CreateCharacter', function (data)
      
 end)
 
+exports('GetUseEssential', function ()
+     return MX.essentialmode
+end)
+
 RegisterNUICallback('PlayCharacter', function (data)
      MX:Cam(false)
      SetNuiFocus(false, false)
-     
+     FreezeEntityPosition(PlayerPedId(), true)
      MX:DelEntity()
      DisplayRadar(1)
      TriggerServerEvent('mx-multicharacter:CheckCharacterIsOwner', data.data)
@@ -234,10 +238,6 @@ RegisterNUICallback('SelectCharacter', function (data)
                end
           end
      end
-end)
-
-exports('GetUseEssential', function ()
-     return MX.essentialmode
 end)
 
 exports('GetCid', function ()
