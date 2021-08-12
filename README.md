@@ -37,7 +37,7 @@ end)
 
 - change with
 ```
-Citizen.CreateThread(function()
+-- Citizen.CreateThread(function()
 -- 	while true do
 -- 		Citizen.Wait(0)
 
