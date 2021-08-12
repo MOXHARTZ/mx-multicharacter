@@ -1,8 +1,8 @@
-RegisterNetEvent('mx-multicharacter:CreateCharacter')
 RegisterNetEvent('mx-multicharacter:GetCharacters')
 RegisterNetEvent('mx-multicharacter:DeleteCharacter')
 RegisterNetEvent('mx-multicharacter:GetLastLoc')
 RegisterNetEvent('mx-multicharacter:CheckCharacterIsOwner')
+RegisterNetEvent('mx-multicharacter:CreateCharacter')
 
 ESX = nil
 TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
@@ -18,9 +18,9 @@ AddEventHandler('mx-multicharacter:DeleteCharacter', function(cid) MX:DeleteChar
 
 AddEventHandler('mx-multicharacter:GetLastLoc', function()
      local src = source
-     local fetch = [[SELECT position FROM users WHERE citizenid = @cid;]]
+     local fetch = [[SELECT position FROM users WHERE identifier = @cid;]]
      local fetchData = {
-          ['@cid'] = MX:GetCitizenId(src)
+          ['@cid'] = MX:GetIdentifier(src)
      }
      local result = MySQL.Sync.fetchAll(fetch, fetchData)
      if result and result[1] then
@@ -31,13 +31,26 @@ AddEventHandler('mx-multicharacter:GetLastLoc', function()
      end
 end)
 
+AddEventHandler('mx-multicharacter:CreateCharacter', function (data)
+     local src = source
+     MX:SetLastCharacter(src, tonumber(data.queue))
+     MX:TCE('mx-multicharacter:StartESX', src)
+     while not ESX.GetPlayerFromId(src) do Wait(500) end
+     MX:SetGeneralInfos(MX:GetIdentifier(src), data)
+     if MX.skinnothave then
+          MX:TCE('mx-multicharacter:OpenSkinMenu', src)
+     end
+end)
+
 AddEventHandler('mx-multicharacter:GetCharacters', function ()
      local src = source
      if not src then DropPlayer(src, '[MX-MULTICHARACTER] Your information was not found') end
+     MX:SetIdentifierToChar(MX:GetIdentifier(src), MX:GetLastCharacter(src))
+     Wait(100)
      local player = MX:GetIdentifier(src) if not player then DropPlayer(src, '[MX-MULTICHARACTER] Your information was not found') end
-     local fetch = [[SELECT * FROM users WHERE identifier = @id;]]
+     local fetch = [[SELECT * FROM users WHERE identifier LIKE @id;]]
      local fetchData = {
-          ['@id'] = player
+          ['@id'] = '%'..player..'%'
      }
      local result = MySQL.Sync.fetchAll(fetch, fetchData)
      if result and #result > 0 then
@@ -45,30 +58,34 @@ AddEventHandler('mx-multicharacter:GetCharacters', function ()
           if not MX.essentialmode then
                for i = 1, #result do
                     table.insert(data, {
-                         citizenid = result[i].citizenid or '',
-                         queue = result[i].queue or '',
+                         queue = tonumber(result[i].identifier:sub(5, 5)),
+                         citizenid = result[i].identifier or '',
                          firstname = result[i].firstname or '',
                          lastname = result[i].lastname or '',
                          dateofbirth = result[i].dateofbirth or '',
                          sex = result[i].sex or '',
                          cash = json.decode(result[i].accounts).money or 0,
                          bank = json.decode(result[i].accounts).bank or 0,
-                         skin = json.decode(result[i].skin) or false
+                         skin = json.decode(result[i].skin) or false,
+                         phone_number = result[i].phone_number or 0,
+                         job = MX:GetJobProps(result[i].job, result[i].job_grade) or 'Unemployed'
                     })
                end
           else
                for i = 1, #result do
                     local resultM = MySQL.Sync.fetchAll('SELECT name, money FROM user_accounts WHERE identifier = @id', {
-                         ['@id'] = result[i].citizenid
+                         ['@id'] = result[i].identifier
                     })
                     table.insert(data, {
-                         citizenid = result[i].citizenid or '',
-                         queue = result[i].queue or '',
+                         queue = result[i].identifier:sub(5, 5),
+                         citizenid = result[i].identifier or '',
                          firstname = result[i].firstname or '',
                          lastname = result[i].lastname or '',
                          dateofbirth = result[i].dateofbirth or '',
                          sex = result[i].sex or '',
-                         skin = json.decode(result[i].skin) or false
+                         skin = json.decode(result[i].skin) or false,
+                         phone_number = result[i].phone_number or 0,
+                         job = MX:GetJobProps(result[i].job, result[i].job_grade) or 'Unemployed'
                     })
                     if resultM and resultM[1] then
                          for j = 1, #resultM do
@@ -81,7 +98,7 @@ AddEventHandler('mx-multicharacter:GetCharacters', function ()
           Wait(0)
           local slots = {}
           local slotsResult = [[SELECT slots FROM user_slots WHERE identifier = @id;]]
-          local slotsResultData = MySQL.Sync.fetchAll(slotsResult, fetchData)
+          local slotsResultData = MySQL.Sync.fetchAll(slotsResult, {['@id'] = MX:GetIdentifier(src)})
           if slotsResultData and slotsResultData[1] then
                slots = json.decode(slotsResultData[1].slots)
           else
@@ -101,61 +118,31 @@ AddEventHandler('mx-multicharacter:GetCharacters', function ()
      end
 end)
 
-AddEventHandler('playerDropped', function () MX:PlayerDropped(source) end)
-
-local StringCharset = {}
-local NumberCharset = {}
-
-for i = 48,  57 do table.insert(NumberCharset, string.char(i)) end
-for i = 65,  90 do table.insert(StringCharset, string.char(i)) end
-for i = 97, 122 do table.insert(StringCharset, string.char(i)) end
-
-exports('GetCitizenId', function (source)
-     if not source then return false end
-     return MX:GetCitizenId(source)
-end)
-
-function MX:GetCitizenId(source) 
-     if #self.players <= 0 then return false end
-     for k,v in pairs(self.players) do
-          if k == source then
-               return v               
-          end
-     end
-     return false
-end
-
-AddEventHandler('mx-multicharacter:CreateCharacter', function (source, tt) 
-     local src = source
-     if not tt then
-          local cid = MX:CreateCitizenId()
-          MX:TCE('mx-multicharacter:SetCitizenId', src, cid)
-          MX.players[src] = cid
-     else
-          MX.players[src] = tt
-          MX:TCE('mx-multicharacter:SetCitizenId', src, tt)
-     end
-end)
-
 AddEventHandler('mx-multicharacter:CheckCharacterIsOwner', function (data)
      local src = source
      if MX:CheckCharacterIsOwner(src, data) then
-          TriggerEvent('mx-multicharacter:CreateCharacter', src, data)
+          MX:SetLastCharacter(src, tonumber(data))
+          MX:SetCharacter(src, tonumber(data))
+          MX:TCE('mx-multicharacter:StartESX', src)
+          while not ESX.GetPlayerFromId(src) do Wait(500) end
+          if MX.skinnothave then
+               MX:TCE('mx-multicharacter:LoadSkin', src)
+          end
           MX:TCE('mx-spawn:Open', src, data)
      else
           DropPlayer(src, 'You dont have this character.')
      end
 end)
 
-function MX:CheckCharacterIsOwner(source, cid)
-     local fetch = [[SELECT citizenid FROM users WHERE identifier = @identifier;]]
+function MX:CheckCharacterIsOwner(source, charid)
+     local fetch = [[SELECT identifier FROM users WHERE identifier LIKE @identifier;]]
      local fetchData = {
-          ['@identifier'] = self:GetIdentifier(source)
+          ['@identifier'] = '%'..self:GetIdentifier(source)..'%'
      }
      local result = MySQL.Sync.fetchAll(fetch, fetchData)
      if result and #result >= 1 then
           for i = 1, #result do
-               if cid == result[i].citizenid then
+               if charid == tonumber(result[i].identifier:sub(5, 5)) then
                     return true
                end
           end
@@ -165,60 +152,76 @@ function MX:CheckCharacterIsOwner(source, cid)
      return false
 end
 
-function MX:CreateCitizenId()
-     local uniq = false
-     local cid = nil
-     while not uniq do
-          Wait(100)
-          cid = tostring(MX:RandomStr(4) .. MX:RandomInt(4))
-          local fetch = [[SELECT citizenid FROM users WHERE citizenid = @cid;]]
-          local fetchData = {['@cid'] = cid}
-          local result = MySQL.Sync.fetchAll(fetch, fetchData)
-          if #result == 0 then
-               uniq = true
-          end
-     end
-     return cid
+function MX:GetJobProps(name, grade)
+     local fetch = [[SELECT label FROM job_grades WHERE job_name = @name AND grade = @grade;]]
+     local fetchData = {
+         ['@name'] = name,
+         ['@grade'] = grade
+     }
+     local result = MySQL.Sync.fetchAll(fetch, fetchData)
+     return result[1] and result[1].label or false
 end
 
 function MX:DeleteCharacter(source, cid)
      if cid and source then
           if self:CheckCharacterIsOwner(source, cid) then
-               for _, v in pairs(self.DeleteTables) do
-                    MySQL.Sync.execute("DELETE FROM `"..v.table.."` WHERE `"..v.owner.."` = '"..cid.."'")
+               for _, v in pairs(self.IdentifierTables) do
+                    MySQL.Sync.execute("DELETE FROM `"..v.table.."` WHERE `"..v.owner.."` = 'Char"..cid..MX:GetIdentifier(source).."'")
                end
                Wait(200)
                DropPlayer(source, 'Your character has been deleted, please login again.') 
           else
-               DropPlayer(src, 'You dont have this character.')
+               DropPlayer(source, 'You dont have this character.')
           end
      else
           DropPlayer(source, '...') 
      end
 end
 
-function MX:PlayerDropped(source)
-     if self.players[source] then
-          self.players[source] = nil
+function MX:SetLastCharacter(source, charid)
+     if source and charid then
+         MySQL.Sync.execute("UPDATE `user_lastcharacter` SET `charid` = '"..charid.."' WHERE `identifier` = '"..MX:GetIdentifier(source).."'")
      end
 end
 
-function MX:RandomInt(length)
-	if length > tonumber('0') then
-		return self:RandomInt(length-tonumber('1')) .. NumberCharset[math.random(tonumber('1'), #NumberCharset)]
-	else
-		return ''
-	end
+function MX:SetIdentifierToChar(identifier, charid)
+     for _, itable in pairs(self.IdentifierTables) do
+         MySQL.Sync.execute("UPDATE `"..itable.table.."` SET `"..itable.owner.."` = 'Char"..charid..identifier.."' WHERE `"..itable.owner.."` = '"..identifier.."'")
+     end
+ end
+ 
+function MX:GetLastCharacter(source)
+     if source then
+         local LastChar = MySQL.Sync.fetchAll("SELECT `charid` FROM `user_lastcharacter` WHERE `identifier` = '"..MX:GetIdentifier(source).."'")
+         if LastChar[1] ~= nil and LastChar[1].charid ~= nil then
+             return tonumber(LastChar[1].charid)
+         else
+             MySQL.Sync.execute("INSERT INTO `user_lastcharacter` (`identifier`, `charid`) VALUES('"..MX:GetIdentifier(source).."', 1)")
+             return 1
+         end
+     end
 end
-      
-function MX:RandomStr(length)
-	if length > 0 then
-		return self:RandomStr(length-1) .. StringCharset[math.random(1, #StringCharset)]
-	else
-		return ''
-	end
+ 
+function MX:SetCharacter(source, charid)
+     if not source then return print('line 190') end
+     MySQL.Sync.execute('UPDATE users SET identifier = @upidentifier WHERE identifier = @identifier', {
+         ['@upidentifier'] = MX:GetIdentifier(source),
+         ['@identifier'] = 'Char'..charid..MX:GetIdentifier(source)
+     })
 end
 
+function MX:SetGeneralInfos(identifier, data)
+     if identifier and data then
+         MySQL.Sync.execute("UPDATE users SET firstname = @firstname, lastname = @lastname, dateofbirth = @dob, sex = @sex WHERE identifier = @identifier", {
+             ['@firstname'] = data.firstname,
+             ['@lastname'] = data.lastname,
+             ['@dob'] = data.dateofbirth,
+             ['@sex'] = data.sex,
+             ['@identifier'] = identifier
+         })
+     end
+end
+      
 function MX:GetIdentifier(player)
      for _,v in pairs(GetPlayerIdentifiers(player)) do
           if self.Identifier == 'steam' then  

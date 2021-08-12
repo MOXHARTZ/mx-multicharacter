@@ -6,7 +6,7 @@ local sub_b0b5 = {
      [4] = "MP_Plane_Passenger_5",
      [5] = "MP_Plane_Passenger_6",
      [6] = "MP_Plane_Passenger_7"
- }
+}
  
  function sub_b747(ped, a_1)
      if a_1 == 0 then
@@ -210,7 +210,25 @@ local sub_b0b5 = {
      SetWeatherTypeNow("EXTRASUNNY") ---- SUN TIME
      StartCutscene(4) --- START the custscene
  
+     local showNotify = true
+     CreateThread(function ()
+         while showNotify do
+            HelpNotification('[E] Skip Scene')
+            if IsControlJustPressed(0, 38) or IsDisabledControlJustPressed(0, 38) then
+                for v_3=0, 6, 1 do
+                    DeleteEntity(ped[v_3])
+                    PrepareMusicEvent("AC_STOP")
+                    TriggerMusicEvent("AC_STOP")
+               end
+               StopCutsceneImmediately()
+               showNotify = false
+               break
+            end
+            Wait(0)
+         end
+     end)
      Wait(31520) --- custscene time
+     showNotify = false
       for v_3=0, 6, 1 do
            DeleteEntity(ped[v_3])
       end
@@ -219,3 +237,16 @@ local sub_b0b5 = {
       
     --   Wait(52500)
 end) 
+ 
+
+HelpNotification = function(msg, thisFrame, beep, duration)
+	AddTextEntry('HelpNotification', msg)
+
+	if thisFrame then
+		DisplayHelpTextThisFrame('HelpNotification', false)
+	else
+		if beep == nil then beep = true end
+		BeginTextCommandDisplayHelp('HelpNotification')
+		EndTextCommandDisplayHelp(0, false, beep, duration or -1)
+	end
+end

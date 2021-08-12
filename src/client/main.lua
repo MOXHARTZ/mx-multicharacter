@@ -2,6 +2,9 @@ RegisterNetEvent('mx-multicharacter:GetCharacters')
 RegisterNetEvent('mx-multicharacter:notification')
 RegisterNetEvent('mx-multicharacter:RefreshCharacters')
 RegisterNetEvent('mx-multicharacter:SetCitizenId')
+RegisterNetEvent('mx-multicharacter:StartESX')
+RegisterNetEvent('mx-multicharacter:OpenSkinMenu')
+RegisterNetEvent('mx-multicharacter:LoadSkin')
 
 CreateThread(function ()
      while true do
@@ -22,6 +25,22 @@ function MX:Notification(msg)
           msg = msg
      })
 end
+
+AddEventHandler('mx-multicharacter:LoadSkin', function ()
+     TriggerEvent('esx:getSharedObject', function(ESX)
+          ESX.TriggerServerCallback('esx_skin:getPlayerSkin', function(skin, jobSkin)
+               TriggerEvent('skinchanger:loadSkin', skin)
+          end)  
+     end)
+end)
+
+AddEventHandler('mx-multicharacter:OpenSkinMenu', function (sex)
+     TriggerEvent('esx_skin:openSaveableMenu', function()
+          TriggerEvent('introCinematic:start', {
+               sex = sex
+          })
+     end)
+end)
 
 function MX:Cam(bool)
      if bool then
@@ -54,7 +73,7 @@ function MX:CreatePeds(data)
           if data and next(data) then
                local find = false
                for k,v in pairs(data) do
-                    if v.queue == i then
+                    if tonumber(v.queue) == i then
                          find = data[k]
                          break
                     end
@@ -182,13 +201,14 @@ RegisterNUICallback('CreateCharacter', function (data)
      SetEntityInvincible(PlayerPedId(), false)
      SetEntityVisible(PlayerPedId(), true)
      FreezeEntityPosition(PlayerPedId(), false)
+     RequestModel(GetHashKey('mp_m_freemode_01'))
+     while not HasModelLoaded(GetHashKey('mp_m_freemode_01')) do
+          RequestModel(GetHashKey('mp_m_freemode_01'))
+          Citizen.Wait(0)
+     end
+     SetPlayerModel(PlayerId(), GetHashKey('mp_m_freemode_01'))
      MX:Cam(false)
      SetNuiFocus(false, false)
-     TriggerServerEvent('mx-multicharacter:CreateCharacter', GetPlayerServerId(PlayerId()))
-     while not MX.CitizenId do
-          print('Waiting...')
-          Wait(100)
-     end
      Wait(500)
      MX.NewCharacterData = {
           firstname = data.firstname,
@@ -197,21 +217,18 @@ RegisterNUICallback('CreateCharacter', function (data)
           dateofbirth = data.date,
           queue = data.queue
      }
+     TriggerServerEvent('mx-multicharacter:CreateCharacter', MX.NewCharacterData)
      MX:DelEntity()
      DisplayRadar(1)
+end)
 
+AddEventHandler('mx-multicharacter:StartESX', function ()
      if not MX.essentialmode then
-          TriggerServerEvent('esx:onPlayerJoined', MX.CitizenId, MX.NewCharacterData)
+          TriggerServerEvent('esx:onPlayerJoined')
      else
           TriggerServerEvent('es:firstJoinProper')
 		TriggerEvent('es:allowedToSpawn')
-          TriggerEvent('esx:CharCreate', MX.CitizenId, MX.NewCharacterData)
      end
-     
-end)
-
-exports('GetUseEssential', function ()
-     return MX.essentialmode
 end)
 
 RegisterNUICallback('PlayCharacter', function (data)
@@ -238,10 +255,6 @@ RegisterNUICallback('SelectCharacter', function (data)
                end
           end
      end
-end)
-
-exports('GetCid', function ()
-     return MX.CitizenId
 end)
 
 exports('GetMulti', function ()

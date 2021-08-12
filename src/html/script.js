@@ -1,5 +1,4 @@
-MX = {};
-
+MX = new Object;
 $(function()
 {
      window.addEventListener('message', function(event) 
@@ -14,47 +13,6 @@ $(function()
           }
      });
      
-     $('.characters').mouseenter(function(){
-          if ($(this).data('active') == true) {
-               var information = $(this).data('inform')
-               $(this).css({
-                    'transform': 'scale(1.09)',
-                    'transition': 'all .6s ease-in-out',
-                    'box-shadow': '4px 4px 4px rgb(50, 0, 0)',
-               });
-               if (information.citizenid != null) {
-                    $('#character-information').html(`
-                    <div class="inform">First Name: <span data-inform="firstname">${information.firstname}</span></span>
-                    <div class="line"></div>
-                    <div class="inform">Last Name: <span data-inform="lastname">${information.lastname}</span></span>
-                    <div class="line"></div>
-                    <div class="inform">Gender: <span data-inform="sex">${(information.sex == 'm') && 'Male' || 'Female'}</span></span>
-                    <div class="line"></div>
-                    <div class="inform">Date Of Birth: <span data-inform="dateofbirth">${information.dateofbirth}</span></span>
-                    <div class="line"></div>
-                    <div class="inform">Cash: <span data-inform="cash">${information.cash}$</span></span>
-                    <div class="line"></div>
-                    <div class="inform">Bank: <span data-inform="bank">${information.bank}$</span></span>`);
-               }else {
-                    $('#character-information').html(`<div class="inform"><h1>Create A Character.</h1></div>`);
-               }
-               $('#information-container').fadeIn(300);
-          }else {
-               $(this).css({
-                    'transform': 'scale(0.95)',
-                    'transition': 'transform .6s ease-in-out, background-color .3s',
-                    'box-shadow': '4px 4px 4px #010405',
-                    'background-color': '#043666',
-                    'color': 'rgba(255, 0, 0, 0.445)'
-               });
-               $('#character-information').html('<div class="inform"><h1>You must be a vip to create a character.</h1></div>');
-               $('#information-container').fadeIn(300);
-          }
-     }).mouseleave(function(){
-          $(this).removeAttr('style')
-          $('#information-container').fadeOut(300);
-     });
-
      $("#register").click(function(e) {
           e.preventDefault();
           var sex = 'male';
@@ -67,17 +25,17 @@ $(function()
           if ($('#firstname').val() != '' && $('#firstname').val() != null) {
               firstname = $('#firstname').val(); 
           }else {
-               return Information('Firstname cannot be empty!');
+               return Information('Firstname can\'t be empty!');
           }
           if ($('#lastname').val() != '' && $('#lastname').val() != null) {
                lastname = $('#lastname').val(); 
           }else {
-                return Information('Lastname cannot be empty!');
+                return Information('Lastname can\'t be empty!');
           }
           if ($('#date').val() != '' && $('#date').val() != null) {
                date = $('#date').val(); 
           }else {
-                return Information('Date cannot be empty!');
+                return Information('Date can\'t be empty!');
           }
           $('#core').fadeOut(300);
           $.post('https://mx-multicharacter/CreateCharacter', JSON.stringify({
@@ -89,7 +47,7 @@ $(function()
           }));
      });
 
-     $('.fa-play').click(function(e) {
+     $('#play').click(function(e) {
           e.preventDefault();
           $.post('https://mx-multicharacter/PlayCharacter', JSON.stringify({
                data: MX.CurrentCharacter
@@ -97,7 +55,7 @@ $(function()
           $('#core').fadeOut(300);
      });
 
-     $('.fa-user-minus').click(function(e) {
+     $('#delete').click(function(e) {
           e.preventDefault();
           AreYouSure("Do you approve the deletion of your character?", function(reply){
                if (reply == 'yes') {
@@ -121,17 +79,37 @@ $(function()
                MX.Current = '#register-container';
                MX.CurrentCharacter = $(this).data('char');
           }else if (self.data('cid') != '' && self.data('active') == true) {
+               if (MX.Current) {
+                    $(MX.Current).html(`<span id="character-name">${MX.CurrentData.firstname + ' ' + MX.CurrentData.lastname}</span>`)
+                    $(MX.Current).removeAttr('style')
+                    MX.Current = false
+                    MX.CurrentData = {}
+               }
                var offset = $(this).offset();
+               var information = $(this).data('inform')
                $('#properties-container').css({
-                    'left': offset.left + 300
+                    'left': offset.left + 115
                });
+               MX.Current = $(this);
+               MX.CurrentData = information
+               $(this).html(`<div id="information-container"><div id="character-information"><div id="name">     <div id="name-header">Los Santos</div>     <div id="name-inf">${information.firstname} ${information.lastname}</div></div><div id="dob">     <div id="dob-header">Date Of Birth</div>     <div id="dob-inf">${information.dateofbirth}</div></div><div id="phone">     <div id="phone-header">Phone Number</div>     <div id="phone-inf">${information.phone_number}</div></div><div id="job">     <div id="job-header">Job Name</div>     <div id="job-inf">${information.job}</div></div><div id="gender">     <div id="gender-header">Gender</div>     <div id="gender-inf">${information.sex}</div></div><div id="cash">     <div id="cash-header">Cash</div>     <div id="cash-inf">${information.cash}$</div></div><div id="bank"><div id="bank-header">Bank</div><div id="bank-inf">${information.bank}$</div></div></div></div>`)
                $('#properties-container').fadeIn(300);
                $('#information-container').fadeIn(300);
-               MX.CurrentCharacter = self.data('cid');
+               MX.CurrentCharacter = self.data('char');
                $.post('https://mx-multicharacter/SelectCharacter', JSON.stringify({
                     queue : self.data('char')
                }))
-               
+               $(this).css({  
+                    'transform': 'scale(1.09)',
+                    'transition': 'all .6s ease-in-out',
+                    'transition': 'all .6s ease-in-out',
+                    'box-shadow': '4px 4px 4px rgba(0, 0, 0, 0.6)',
+                    'top': '15px',
+                    'height': '200%',
+                    'width': '17%',
+               });
+          }else if (self.data('active') == false) {
+               Information('You can\'t use this slot.')
           }
      });
 });
@@ -178,11 +156,12 @@ function BuildCharacters(data, slots, vip) {
      }
      if (Object.keys(MX.Characters).length != 0) {
           $.each(MX.Characters, function(k,v) {
-               if ($(`.characters[data-char="${v.queue}"]`).data('active')) {
-                    $(`.characters[data-char="${v.queue}"]`).html(`<span id="character-name">${v.firstname + ' ' + v.lastname}</span>`);
-                    $(`.characters[data-char="${v.queue}"]`).data('cid', v.citizenid);
-                    $(`.characters[data-char="${v.queue}"]`).data('inform', MX.Characters[k]);
-                    $(`.characters[data-char="${v.queue}"]`).data('active', true);
+               var queue = v.citizenid.charAt(4);
+               if ($(`.characters[data-char="${queue}"]`).data('active')) {
+                    $(`.characters[data-char="${queue}"]`).html(`<span id="character-name">${v.firstname + ' ' + v.lastname}</span>`);
+                    $(`.characters[data-char="${queue}"]`).data('cid', v.citizenid);
+                    $(`.characters[data-char="${queue}"]`).data('inform', MX.Characters[k]);
+                    $(`.characters[data-char="${queue}"]`).data('active', true);
                }
           });
      }
