@@ -38,7 +38,7 @@ AddEventHandler('mx-multicharacter:CreateCharacter', function (data)
      while not ESX.GetPlayerFromId(src) do Wait(500) end
      MX:SetGeneralInfos(MX:GetIdentifier(src), data)
      if MX.skinnothave then
-          MX:TCE('mx-multicharacter:OpenSkinMenu', src)
+          MX:TCE('mx-multicharacter:OpenSkinMenu', src, data.sex)
      end
 end)
 
