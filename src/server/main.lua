@@ -204,10 +204,13 @@ end
  
 function MX:SetCharacter(source, charid)
      if not source then return print('line 190') end
-     MySQL.Sync.execute('UPDATE users SET identifier = @upidentifier WHERE identifier = @identifier', {
-         ['@upidentifier'] = MX:GetIdentifier(source),
-         ['@identifier'] = 'Char'..charid..MX:GetIdentifier(source)
-     })
+
+     local currentUserIdentifier = MX:GetIdentifier(source)
+     local charIdentifier = 'Char'..charid..MX:GetIdentifier(source)
+
+     for _, itable in pairs(self.IdentifierTables) do
+          MySQL.Sync.execute("UPDATE `"..itable.table.."` SET `"..itable.owner.."` = '"..currentUserIdentifier.."' WHERE `"..itable.owner.."` = '"..charIdentifier.."'")
+     end
 end
 
 function MX:SetGeneralInfos(identifier, data)
