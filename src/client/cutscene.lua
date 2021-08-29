@@ -219,6 +219,7 @@ local sub_b0b5 = {
                     DeleteEntity(ped[v_3])
                     PrepareMusicEvent("AC_STOP")
                     TriggerMusicEvent("AC_STOP")
+	            SetEntityCoords(PlayerPedId(), MX.GeneralSpawn)
                end
                StopCutsceneImmediately()
                showNotify = false
