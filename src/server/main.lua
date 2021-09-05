@@ -35,7 +35,7 @@ AddEventHandler('mx-multicharacter:CreateCharacter', function (data)
      local src = source
      MX:SetLastCharacter(src, tonumber(data.queue))
      MX:TCE('mx-multicharacter:StartESX', src)
-     while not ESX.GetPlayerFromId(src) do Wait(500) end
+     while not ESX.GetPlayerFromId(src) do Wait(500) print('Loading ESX for '..GetPlayerName(src)..'') end
      MX:SetGeneralInfos(MX:GetIdentifier(src), data)
      if MX.skinnothave then
           MX:TCE('mx-multicharacter:OpenSkinMenu', src, data.sex)
@@ -66,7 +66,7 @@ AddEventHandler('mx-multicharacter:GetCharacters', function ()
                          sex = result[i].sex or '',
                          cash = json.decode(result[i].accounts).money or 0,
                          bank = json.decode(result[i].accounts).bank or 0,
-                         skin = json.decode(result[i].skin) or false,
+                         skin = json.decode(result[i].skin) or {},
                          phone_number = result[i].phone_number or 0,
                          job = MX:GetJobProps(result[i].job, result[i].job_grade) or 'Unemployed'
                     })
@@ -83,7 +83,7 @@ AddEventHandler('mx-multicharacter:GetCharacters', function ()
                          lastname = result[i].lastname or '',
                          dateofbirth = result[i].dateofbirth or '',
                          sex = result[i].sex or '',
-                         skin = json.decode(result[i].skin) or false,
+                         skin = json.decode(result[i].skin) or {},
                          phone_number = result[i].phone_number or 0,
                          job = MX:GetJobProps(result[i].job, result[i].job_grade) or 'Unemployed'
                     })
@@ -124,7 +124,7 @@ AddEventHandler('mx-multicharacter:CheckCharacterIsOwner', function (data)
           MX:SetLastCharacter(src, tonumber(data))
           MX:SetCharacter(src, tonumber(data))
           MX:TCE('mx-multicharacter:StartESX', src)
-          while not ESX.GetPlayerFromId(src) do Wait(500) end
+          while not ESX.GetPlayerFromId(src) do Wait(500) print('Loading ESX for '..GetPlayerName(src)..'') end
           if MX.skinnothave then
                MX:TCE('mx-multicharacter:LoadSkin', src)
           end

@@ -12,6 +12,16 @@ https://youtu.be/V87r0_HAujE
 - Slots can be unlocked vip players or everyone.
 - Cinematic intro
 
+## F.A.Q
+### My character is not saved, what should I do?
+- Your character is not saved because es_extended is not triggered. There is currently no solution for this issue.
+
+### My character does not appear on the screen or appears as invisible, what should I do?
+- Set `skinnothave` true in the config. This error is caused because esx_skin is not triggered.
+
+### I'm using extendedmode or a version older than 1.2. Is it supported?
+- I have never used a version older than 1.2. But it's supported.
+
 ## Requirements
 - mx-spawn (https://github.com/MOXHAFOREVA/mx-spawn)
 
