@@ -19,6 +19,9 @@ https://youtu.be/V87r0_HAujE
 ### My character does not appear on the screen or appears as invisible, what should I do?
 - Set `skinnothave` true in the config. This error is caused because esx_skin is not triggered.
 
+### Can I use this script without deleting my previous characters?
+- Yes, if you are not using a multicharacter before, you will not have a problem when you switch to this system.
+
 ### I'm using extendedmode or a version older than 1.2. Is it supported?
 - I have never used a version older than 1.2. But it's supported.
 
