@@ -25,6 +25,9 @@ https://youtu.be/V87r0_HAujE
 ### I'm using extendedmode or a version older than 1.2. Is it supported?
 - I have never used a version older than 1.2. But it's supported.
 
+### My character does not appear or every time I open a character, it asks me to open a character again.
+- Customize identifier setting via config. 
+
 ## Requirements
 - mx-spawn (https://github.com/MOXHAFOREVA/mx-spawn)
 
