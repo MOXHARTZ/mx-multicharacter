@@ -1,19 +1,20 @@
 MX = new Object;
-$(function()
-{
-     window.addEventListener('message', function(event) 
-     {
+$(function () {
+     window.addEventListener('message', function (event) {
           switch (event.data.type) {
                case 'SetupCharacters':
                     BuildCharacters(event.data.handler, event.data.slots, event.data.useVIP);
-               break;
+                    break;
                case 'notification':
                     Information(event.data.msg)
-               break;
+                    break;
+               case 'refresh':
+                    Refresh()
+                    break;
           }
      });
-     
-     $("#register").click(function(e) {
+
+     $("#register").click(function (e) {
           e.preventDefault();
           var sex = 'male';
           var firstname = '';
@@ -23,31 +24,31 @@ $(function()
                sex = 'female';
           }
           if ($('#firstname').val() != '' && $('#firstname').val() != null) {
-              firstname = $('#firstname').val(); 
-          }else {
+               firstname = $('#firstname').val();
+          } else {
                return Information('Firstname can\'t be empty!');
           }
           if ($('#lastname').val() != '' && $('#lastname').val() != null) {
-               lastname = $('#lastname').val(); 
-          }else {
-                return Information('Lastname can\'t be empty!');
+               lastname = $('#lastname').val();
+          } else {
+               return Information('Lastname can\'t be empty!');
           }
           if ($('#date').val() != '' && $('#date').val() != null) {
-               date = $('#date').val(); 
-          }else {
-                return Information('Date can\'t be empty!');
+               date = $('#date').val();
+          } else {
+               return Information('Date can\'t be empty!');
           }
           $('#core').fadeOut(300);
           $.post('https://mx-multicharacter/CreateCharacter', JSON.stringify({
-               firstname : firstname,
-               lastname : lastname,
-               sex : sex,
-               date : date,
-               queue : MX.CurrentCharacter
+               firstname: firstname,
+               lastname: lastname,
+               sex: sex,
+               date: date,
+               queue: MX.CurrentCharacter
           }));
      });
 
-     $('#play').click(function(e) {
+     $('#play').click(function (e) {
           e.preventDefault();
           $.post('https://mx-multicharacter/PlayCharacter', JSON.stringify({
                data: MX.CurrentCharacter
@@ -55,9 +56,9 @@ $(function()
           $('#core').fadeOut(300);
      });
 
-     $('#delete').click(function(e) {
+     $('#delete').click(function (e) {
           e.preventDefault();
-          AreYouSure("Do you approve the deletion of your character?", function(reply){
+          AreYouSure("Do you approve the deletion of your character?", function (reply) {
                if (reply == 'yes') {
                     $.post('https://mx-multicharacter/DeleteCharacter', JSON.stringify({
                          citizenid: MX.CurrentCharacter
@@ -65,8 +66,38 @@ $(function()
                }
           })
      });
+});
 
-     $('.characters').click(function(e){
+$(document).on('keydown', function () {
+     if (event.keyCode == 27 && MX.Current != null) {
+          if (MX.Current == '#register-container') {
+               $(MX.Current).animate({
+                    top: '-100%'
+               }, 400);
+               $('#information-container').fadeIn(400);
+               $('#characters-container').fadeIn(400);
+
+          }
+          MX.Current = null;
+     }
+});
+
+function BuildCharacters(data, slots, vip) {
+     document.getElementById('characters-container').innerHTML = `
+          <div class="characters" data-char="1" data-cid="" data-active="true" data-inform={}>
+                         <i class="fas fa-plus fa-2x"></i>
+                    </div>
+                    <div class="characters" data-char="2" data-cid="" data-active="false" data-inform={}> 
+                         <i class="fas fa-times fa-2x"></i>
+                    </div>
+                    <div class="characters" data-char="3" data-cid="" data-active="false" data-inform={}>
+                         <i class="fas fa-times fa-2x"></i>
+                    </div>
+                    <div class="characters" data-char="4" data-cid="" data-active="false" data-inform={}>
+                         <i class="fas fa-times fa-2x"></i>
+          </div>`;
+
+     $('.characters').click(function (e) {
           e.preventDefault();
           var self = $(this)
           if (self.data('cid') == '' && self.data('active') == true) {
@@ -74,11 +105,11 @@ $(function()
                $('#characters-container').fadeOut(300);
                $('#properties-container').fadeOut(300);
                $('#register-container').animate({
-                   top: '50%'
+                    top: '50%'
                }, 400);
                MX.Current = '#register-container';
                MX.CurrentCharacter = $(this).data('char');
-          }else if (self.data('cid') != '' && self.data('active') == true) {
+          } else if (self.data('cid') != '' && self.data('active') == true) {
                if (MX.Current) {
                     $(MX.Current).html(`<span id="character-name">${MX.CurrentData.firstname + ' ' + MX.CurrentData.lastname}</span>`)
                     $(MX.Current).removeAttr('style')
@@ -97,9 +128,9 @@ $(function()
                $('#information-container').fadeIn(300);
                MX.CurrentCharacter = self.data('char');
                $.post('https://mx-multicharacter/SelectCharacter', JSON.stringify({
-                    queue : self.data('char')
+                    queue: self.data('char')
                }))
-               $(this).css({  
+               $(this).css({
                     'transform': 'scale(1.09)',
                     'transition': 'all .6s ease-in-out',
                     'transition': 'all .6s ease-in-out',
@@ -108,27 +139,10 @@ $(function()
                     'height': '200%',
                     'width': '17%',
                });
-          }else if (self.data('active') == false) {
+          } else if (self.data('active') == false) {
                Information('You can\'t use this slot.')
           }
      });
-});
-
-$(document).on('keydown', function() {
-     if (event.keyCode == 27 && MX.Current != null) {
-          if (MX.Current == '#register-container') {
-               $(MX.Current).animate({
-                   top: '-100%'
-               }, 400);
-               $('#information-container').fadeIn(400);
-               $('#characters-container').fadeIn(400);
-
-          }
-          MX.Current = null;
-     }
-});
-
-function BuildCharacters(data, slots, vip) {
      MX.Characters = data;
      MX.Slots = slots;
      if (vip) {
@@ -146,7 +160,7 @@ function BuildCharacters(data, slots, vip) {
                     $('.characters[data-char="4"]').html('<i class="fas fa-plus fa-2x"></i>')
                }
           }
-     }else {
+     } else {
           $('.characters[data-char="2"]').data('active', true);
           $('.characters[data-char="2"]').html('<i class="fas fa-plus fa-2x"></i>');
           $('.characters[data-char="3"]').data('active', true);
@@ -155,7 +169,7 @@ function BuildCharacters(data, slots, vip) {
           $('.characters[data-char="4"]').html('<i class="fas fa-plus fa-2x"></i>');
      }
      if (Object.keys(MX.Characters).length != 0) {
-          $.each(MX.Characters, function(k,v) {
+          $.each(MX.Characters, function (k, v) {
                var queue = v.citizenid.charAt(4);
                if ($(`.characters[data-char="${queue}"]`).data('active')) {
                     $(`.characters[data-char="${queue}"]`).html(`<span id="character-name">${v.firstname + ' ' + v.lastname}</span>`);
@@ -184,14 +198,14 @@ function AreYouSure(msg, cb) {
      $('#areyousure-container').animate({
           top: '35%'
      });
-     $('.areyousure-yes-container').click(function(e) {
+     $('.areyousure-yes-container').click(function (e) {
           e.preventDefault();
           cb('yes');
           $('#areyousure-container').animate({
                top: '-100%'
           });
      });
-     $('.areyousure-no-container').click(function(e) {
+     $('.areyousure-no-container').click(function (e) {
           e.preventDefault();
           cb('no');
           $('#areyousure-container').animate({
@@ -204,11 +218,24 @@ function Information(msg) {
      $('#info-container').html(`<span class="inform-msg">${msg}</span>`)
      $('#info-container').fadeIn(300);
      $('#info-container').animate({
-         right: '0'
+          right: '0'
      });
      setTimeout(() => {
-         $('#info-container').animate({
-             right: '-100%'
-         }); 
+          $('#info-container').animate({
+               right: '-100%'
+          });
      }, 4500);
+}
+
+function Refresh() {
+     $('#core').fadeOut(0);
+     if (MX.Current) {
+          $(MX.Current).html(`<span id="character-name">${MX.CurrentData.firstname + ' ' + MX.CurrentData.lastname}</span>`)
+          $(MX.Current).removeAttr('style')
+          MX.Current = false
+          MX.CurrentData = {}
+     }
+     $('#properties-container').fadeOut(300);
+     MX.Current = null;
+     MX.CurrentCharacter = null;
 }

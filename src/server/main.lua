@@ -42,8 +42,10 @@ AddEventHandler('mx-multicharacter:CreateCharacter', function (data)
      end
 end)
 
+local settedIdentifier = false
 AddEventHandler('mx-multicharacter:GetCharacters', function ()
      local src = source
+     if not settedIdentifier then MX:CheckIdentifier() end
      if not src then DropPlayer(src, '[MX-MULTICHARACTER] Your information was not found') end
      MX:SetIdentifierToChar(MX:GetIdentifier(src), MX:GetLastCharacter(src))
      Wait(100)
@@ -166,10 +168,14 @@ function MX:DeleteCharacter(source, cid)
      if cid and source then
           if self:CheckCharacterIsOwner(source, cid) then
                for _, v in pairs(self.IdentifierTables) do
-                    MySQL.Sync.execute("DELETE FROM `"..v.table.."` WHERE `"..v.owner.."` = 'Char"..cid..MX:GetIdentifier(source).."'")
+                    local result = MySQL.Sync.fetchAll("select * from `"..v.table.."` where `"..v.owner.."` = 'Char"..cid..MX:GetIdentifier(source).."' limit 1")
+                    if result and result[1] then
+                         MySQL.Sync.execute("DELETE FROM `"..v.table.."` WHERE `"..v.owner.."` = 'Char"..cid..MX:GetIdentifier(source).."'")
+                    end
                end
                Wait(200)
-               DropPlayer(source, 'Your character has been deleted, please login again.') 
+               self:TCE('mx-multicharacter:refresh', source)
+               -- DropPlayer(source, 'Your character has been deleted, please login again.') 
           else
                DropPlayer(source, 'You dont have this character.')
           end
@@ -186,7 +192,14 @@ end
 
 function MX:SetIdentifierToChar(identifier, charid)
      for _, itable in pairs(self.IdentifierTables) do
-         MySQL.Sync.execute("UPDATE `"..itable.table.."` SET `"..itable.owner.."` = 'Char"..charid..identifier.."' WHERE `"..itable.owner.."` = '"..identifier.."'")
+          local result = MySQL.Sync.fetchAll("select * from `"..itable.table.."` where `"..itable.owner.."` = '"..identifier.."' limit 1", {
+               ['@column'] = itable.table,
+               ['@owner_'] = itable.owner,
+               ['@owner'] = identifier
+          })
+          if result and result[1] then
+               MySQL.Sync.execute("UPDATE `"..itable.table.."` SET `"..itable.owner.."` = 'Char"..charid..identifier.."' WHERE `"..itable.owner.."` = '"..identifier.."'")
+          end
      end
  end
  
@@ -238,6 +251,20 @@ function MX:GetIdentifier(player)
           end
      end
      return false
+end
+
+function MX:CheckIdentifier()
+     print('^1MX-MULTICHARACTER: ^0 Checking ur identifier')
+     local result, newIdentifier = MySQL.Sync.fetchAll('select identifier from users limit 1'), false
+     if result[1] then
+          local identifier = result[1].identifier
+          if string.match(identifier, 'steam') then newIdentifier = 'steam' else newIdentifier = 'license' end
+          print(newIdentifier, self.Identifier)
+          if self.Identifier ~= newIdentifier then self.Identifier = newIdentifier print(('^1MX-MULTICHARACTER: ^0 ^2 Changed Identifier to ^4%s.^0'):format(newIdentifier)) end
+          settedIdentifier = true
+     else
+          print('^1MX-MULTICHARACTER: ^0 Checking ur identifier')
+     end
 end
 
 function MX:TCE(...)

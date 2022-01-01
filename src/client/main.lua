@@ -5,6 +5,7 @@ RegisterNetEvent('mx-multicharacter:SetCitizenId')
 RegisterNetEvent('mx-multicharacter:StartESX')
 RegisterNetEvent('mx-multicharacter:OpenSkinMenu')
 RegisterNetEvent('mx-multicharacter:LoadSkin')
+RegisterNetEvent('mx-multicharacter:refresh')
 
 CreateThread(function ()
      while true do
@@ -32,6 +33,13 @@ AddEventHandler('mx-multicharacter:LoadSkin', function ()
                TriggerEvent('skinchanger:loadSkin', skin)
           end)  
      end)
+end)
+
+AddEventHandler('mx-multicharacter:refresh', function ()
+     SendNUIMessage({
+          type = 'refresh'
+     })
+     MX:CharacterSelector()
 end)
 
 AddEventHandler('mx-multicharacter:OpenSkinMenu', function (sex)
