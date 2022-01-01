@@ -259,11 +259,10 @@ function MX:CheckIdentifier()
      if result[1] then
           local identifier = result[1].identifier
           if string.match(identifier, 'steam') then newIdentifier = 'steam' else newIdentifier = 'license' end
-          print(newIdentifier, self.Identifier)
           if self.Identifier ~= newIdentifier then self.Identifier = newIdentifier print(('^1MX-MULTICHARACTER: ^0 ^2 Changed Identifier to ^4%s.^0'):format(newIdentifier)) end
           settedIdentifier = true
      else
-          print('^1MX-MULTICHARACTER: ^0 Checking ur identifier')
+          print('^1MX-MULTICHARACTER: ^0 No player found on sql.')
      end
 end
 
