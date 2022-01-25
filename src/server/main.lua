@@ -127,10 +127,8 @@ AddEventHandler('mx-multicharacter:CheckCharacterIsOwner', function (data)
           MX:SetCharacter(src, tonumber(data))
           MX:TCE('mx-multicharacter:StartESX', src)
           while not ESX.GetPlayerFromId(src) do Wait(500) print('Loading ESX for '..GetPlayerName(src)..'') end
-          if MX.skinnothave then
-               MX:TCE('mx-multicharacter:LoadSkin', src)
-          end
-          MX:TCE('mx-spawn:Open', src, data)
+          if MX.skinnothave then MX:TCE('mx-multicharacter:LoadSkin', src) end
+          if MX.MXSpawn then MX:TCE('mx-spawn:Open', src, data) end
      else
           DropPlayer(src, 'You dont have this character.')
      end

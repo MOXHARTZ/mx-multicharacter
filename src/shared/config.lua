@@ -55,6 +55,7 @@ MX = {
      GeneralSpawn = vec3(-1049.942, -2724.759, 20.169294),
      InvisibleSpawn = vec3(1170.10, -1264.40, 20.25),
      UseVIP = true, -- 
+     MXSpawn = false,
      PedSpawnLocs = {
           [1] = vec4(1133.10, -1264.40, 20.75, 44.13),
           [2] = vec4(1130.40, -1265.90, 20.65, 44.13),
